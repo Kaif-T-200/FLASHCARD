@@ -1,0 +1,1791 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>✨ Flashcard Master ✨</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- MADE BY KAIF TARASAGAR -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+      :root {
+        --primary-color: #6c5ce7;
+        --secondary-color: #a29bfe;
+        --success-color: #00b894;
+        --danger-color: #d63031;
+        --warning-color: #fdcb6e;
+        --light-color: #f8f9fa;
+        --dark-color: #2d3436;
+        --text-color: #2d3436;
+        --bg-color: #f5f6fa;
+        --card-bg: #ffffff;
+      }
+
+      [data-theme="dark"] {
+        --primary-color: #a29bfe;
+        --secondary-color: #6c5ce7;
+        --success-color: #55efc4;
+        --danger-color: #ff7675;
+        --warning-color: #ffeaa7;
+        --light-color: #636e72;
+        --dark-color: #dfe6e9;
+        --text-color: #dfe6e9;
+        --bg-color: #2d3436;
+        --card-bg: #1e272e;
+      }
+
+      [data-theme="blue"] {
+        --primary-color: #0984e3;
+        --secondary-color: #74b9ff;
+        --success-color: #00cec9;
+        --danger-color: #ff7675;
+        --warning-color: #fdcb6e;
+        --light-color: #dfe6e9;
+        --dark-color: #2d3436;
+        --text-color: #2d3436;
+        --bg-color: #dfe6e9;
+        --card-bg: #ffffff;
+      }
+
+      [data-theme="green"] {
+        --primary-color: #00b894;
+        --secondary-color: #55efc4;
+        --success-color: #00cec9;
+        --danger-color: #d63031;
+        --warning-color: #fdcb6e;
+        --light-color: #dfe6e9;
+        --dark-color: #2d3436;
+        --text-color: #2d3436;
+        --bg-color: #dfe6e9;
+        --card-bg: #ffffff;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.3s ease;
+        margin: 0;
+        overflow-x: hidden;
+      }
+
+      #background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        overflow: hidden;
+      }
+
+       .subtext {
+    color: #bbb;          /* light gray */
+    font-size: 0.75em;    /* smaller size */
+    font-weight: normal;  /* less bold */
+  }
+
+      .question-mark {
+        position: absolute;
+        color: rgb(255, 0, 0);
+        animation: fall linear infinite;
+        user-select: none;
+        pointer-events: none;
+      }
+
+      @keyframes fall {
+        from {
+          transform: translateY(-100px);
+        }
+        to {
+          transform: translateY(100vh); 
+        }
+      }
+
+      .navbar-brand {
+        font-weight: 700;
+        font-size: 1.5rem;
+        background: linear-gradient(
+          45deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        background-clip: text;
+        -webkit-background-clip: text;
+        -moz-background-clip: text;
+        color: transparent;
+        -webkit-text-fill-color: transparent;
+        -moz-text-fill-color: transparent;
+      }
+
+      .main-container {
+        flex: 1;
+        padding: 2rem 0;
+        position: relative;
+        z-index: 1;
+      }
+
+      .mode-selector {
+        margin-bottom: 2rem;
+      }
+
+      .mode-btn {
+        border: none;
+        border-radius: 50px;
+        padding: 0.5rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s;
+        margin: 0 0.5rem;
+        background-color: rgba(108, 92, 231, 0.1);
+        color: var(--primary-color);
+      }
+
+      .mode-btn.active {
+        background-color: var(--primary-color);
+        color: white;
+      }
+
+      .flashcard-container {
+        perspective: 2000px;
+        margin-bottom: 2rem;
+        position: relative;
+      }
+
+      .flashcard {
+        width: 100%;
+        height: 350px;
+        position: relative;
+        transform-style: preserve-3d;
+        transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border-radius: 20px;
+        cursor: pointer;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        background: transparent;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      .flashcard.flipped {
+        transform: rotateY(180deg);
+      }
+
+      .flashcard.correct {
+        animation: correctAnswer 0.5s ease;
+      }
+
+      .flashcard.incorrect {
+        animation: incorrectAnswer 0.5s ease;
+      }
+
+      .flashcard.new {
+        animation: newCard 0.6s ease;
+      }
+
+      .flashcard .side {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden; 
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        text-align: center;
+        border-radius: 20px;
+        background: var(--card-bg);
+        box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+      }
+
+      .flashcard .side.front {
+        background: linear-gradient(
+          135deg,
+          var(--card-bg) 0%,
+          rgba(108, 92, 231, 0.05) 100%
+        );
+        color: var(--text-color);
+      }
+      .flashcard .side.back {
+        background: linear-gradient(
+          135deg,
+          var(--card-bg) 0%,
+          rgba(0, 184, 148, 0.05) 100%
+        );
+        color: var(--text-color);
+        transform: rotateY(180deg); 
+      }
+
+      .card-category {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background-color: var(--primary-color);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+
+      .card-content {
+        font-size: 1.5rem;
+        font-weight: 500;
+        width: 100%;
+        transition: all 0.3s;
+        padding: 20px;
+        word-wrap: break-word;
+        overflow: auto;
+        max-height: 100%;
+      }
+
+      .card-hint {
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        color: var(--light-color);
+        opacity: 0.8;
+        position: absolute;
+        bottom: 15px;
+      }
+
+      .controls {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: none;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn:active {
+        transform: translateY(2px);
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+      }
+
+      .btn-primary {
+        background-color: var(--primary-color);
+        color: white;
+      }
+
+      .btn-success {
+        background-color: var(--success-color);
+        color: white;
+      }
+
+      .btn-danger {
+        background-color: var(--danger-color);
+        color: white;
+      }
+
+      .btn-warning {
+        background-color: var(--warning-color);
+        color: var(--dark-color);
+      }
+
+      .stats-container {
+        background: var(--card-bg);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      }
+
+      .stats {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+      }
+
+      .stat-item {
+        text-align: center;
+        padding: 0.5rem;
+        border-radius: 10px;
+        background: rgba(108, 92, 231, 0.1);
+      }
+
+      .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+      }
+
+      .stat-label {
+        font-size: 0.8rem;
+        color: var(--light-color);
+      }
+
+      .progress-container {
+        margin-bottom: 1rem;
+      }
+
+      .progress {
+        height: 10px;
+        border-radius: 5px;
+        background-color: rgba(108, 92, 231, 0.1);
+      }
+
+      .progress-bar {
+        background-color: var(--primary-color);
+        transition: width 0.5s ease;
+      }
+
+      .chart-container {
+        height: 200px;
+        margin-top: 1rem;
+        position: relative;
+      }
+
+      .settings-panel {
+        position: fixed;
+        top: 0;
+        right: -350px;
+        width: 350px;
+        height: 100vh;
+        background: var(--card-bg);
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        transition: right 0.3s ease;
+        z-index: 1000;
+        overflow-y: auto;
+      }
+
+      .settings-panel.open {
+        right: 0;
+      }
+
+      .settings-toggle {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1001;
+        background: var(--primary-color);
+        color: white;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+        transition: all 0.3s;
+      }
+
+      .settings-toggle:hover {
+        transform: rotate(30deg);
+      }
+
+      .theme-selector {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .theme-option {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: all 0.3s;
+      }
+
+      .theme-option:hover {
+        transform: scale(1.05);
+      }
+
+      .theme-option.active {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.3);
+      }
+
+      .form-control {
+        background-color: var(--bg-color);
+        border-color: var(--light-color);
+        color: var(--text-color);
+      }
+
+      .form-control:focus {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.25rem rgba(108, 92, 231, 0.25);
+      }
+
+      .form-label {
+        color: var(--text-color);
+      }
+
+      .hint-text {
+        font-size: 0.8rem;
+        color: var(--light-color);
+        margin-top: 0.5rem;
+      }
+
+      .celebration {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 999;
+      }
+
+      @keyframes correctAnswer {
+        0% {
+          transform: rotateY(0deg) scale(1);
+        }
+        50% {
+          transform: rotateY(180deg) scale(1.05);
+          box-shadow: 0 0 30px rgba(0, 184, 148, 0.5);
+        }
+        100% {
+          transform: rotateY(0deg) scale(1);
+        }
+      }
+
+      @keyframes incorrectAnswer {
+        0% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-10px);
+        }
+        50% {
+          transform: translateX(10px);
+        }
+        75% {
+          transform: translateX(-10px);
+        }
+        100% {
+          transform: translateX(0);
+        }
+      }
+
+      @keyframes newCard {
+        0% {
+          transform: scale(0.8);
+          opacity: 0;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .flashcard {
+          height: 300px;
+        }
+
+        .card-content {
+          font-size: 1.2rem;
+        }
+
+        .controls {
+          gap: 0.5rem;
+        }
+
+        .btn {
+          padding: 0.5rem 1rem;
+          font-size: 0.9rem;
+        }
+
+        .settings-panel {
+          width: 280px;
+          right: -280px;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .flashcard {
+          height: 250px;
+        }
+
+        .card-content {
+          font-size: 1rem;
+        }
+
+        .stats {
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .mode-selector {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .mode-btn {
+          margin: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="background"></div>
+
+   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand" href="#">
+      ✨ Flashcard Master 
+      <span class="subtext">(correct all answer and see magic)</span>
+    </a>
+    <div class="d-flex align-items-center">
+      <button id="sound-toggle" class="btn btn-sm btn-outline-light me-2">
+        <i class="fas fa-volume-up"></i>
+      </button>
+      <button id="theme-toggle" class="btn btn-sm btn-outline-light">
+        <i class="fas fa-moon"></i>
+      </button>
+    </div>
+  </div>
+</nav>
+
+    <div class="main-container container">
+      <div class="row">
+        <div class="col-lg-8 mx-auto">
+          <div class="mode-selector text-center">
+            <button class="mode-btn active" data-mode="learn">
+              <i class="fas fa-graduation-cap me-2"></i>Learn/Reset
+            </button>
+          </div>
+
+          <div class="stats-container">
+            <div class="stats">
+              <div class="stat-item">
+                <!-- MADE BY KAIF TARASAGAR -->
+                <div class="stat-value" id="cards-remaining">0</div>
+                <div class="stat-label">Remaining</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value text-success" id="cards-known">0</div>
+                <div class="stat-label">Known</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value text-danger" id="cards-unknown">0</div>
+                <div class="stat-label">Unknown</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value text-warning" id="mastery-level">0%</div>
+                <div class="stat-label">Mastery</div>
+              </div>
+            </div>
+
+            <div class="progress-container">
+              <div class="d-flex justify-content-between mb-2">
+                <span>Deck Progress</span>
+                <span id="progress-text">0%</span>
+              </div>
+              <div class="progress">
+                <div
+                  class="progress-bar"
+                  id="progress-bar"
+                  role="progressbar"
+                  style="width: 0%"
+                ></div>
+              </div>
+            </div>
+
+            <div class="chart-container">
+              <canvas id="stats-chart"></canvas>
+            </div>
+          </div>
+
+          <div class="flashcard-container">
+            <div class="flashcard new" id="flashcard">
+              <div class="side front">
+                <div class="card-category" id="card-category">General</div>
+                <div class="card-content" id="question"></div>
+                <div class="card-hint">Click or press Space to flip</div>
+              </div>
+              <div class="side back">
+                <div class="card-category" id="card-category-back">General</div>
+                <div class="card-content" id="answer"></div>
+                <div class="card-hint">Did you know this?</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="controls">
+            <button class="btn btn-danger" id="dont-know-btn">
+              <i class="fas fa-times me-1"></i> Don't Know
+            </button>
+            <button class="btn btn-warning" id="hint-btn">
+              <i class="fas fa-lightbulb me-1"></i> Hint
+            </button>
+            <button class="btn btn-primary" id="read-question-btn">
+              <i class="fas fa-volume-up me-1"></i> Read
+            </button>
+            <button class="btn btn-primary" id="flip-btn">
+              <i class="fas fa-sync-alt me-1"></i> Flip
+            </button>
+            <button class="btn btn-success" id="know-btn">
+              <i class="fas fa-check me-1"></i> Know
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-toggle" id="settings-toggle">
+      <i class="fas fa-cog"></i>
+    </div>
+
+    <div class="settings-panel" id="settings-panel">
+      <h4 class="mb-4"><i class="fas fa-cog me-2"></i>Settings</h4>
+
+      <div class="mb-4">
+        <h5 class="mb-3">Appearance</h5>
+        <div class="mb-3">
+          <label class="form-label">Theme</label>
+          <div class="theme-selector">
+            <div
+              class="theme-option active"
+              data-theme="light"
+              style="background: #f5f6fa"
+            ></div>
+            <div
+              class="theme-option"
+              data-theme="dark"
+              style="background: #2d3436"
+            ></div>
+            <div
+              class="theme-option"
+              data-theme="blue"
+              style="background: #0984e3"
+            ></div>
+            <div
+              class="theme-option"
+              data-theme="green"
+              style="background: #00b894"
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <h5 class="mb-3">Study Settings</h5>
+        <div class="mb-3">
+          <label for="study-mode" class="form-label">Default Study Mode</label>
+          <select class="form-select" id="study-mode">
+            <option value="learn">Learn</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="card-order" class="form-label">Card Order</label>
+          <select class="form-select" id="card-order">
+            <option value="sequential">Sequential</option>
+            <option value="random">Random</option>
+            <option value="smart">Smart (Spaced Repetition)</option>
+          </select>
+        </div>
+        <div class="form-check form-switch mb-3">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            id="auto-flip"
+            checked
+          />
+          <label class="form-check-label" for="auto-flip"
+            >Auto-flip after answer</label
+          >
+        </div>
+        <div class="form-check form-switch mb-3">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            id="show-hint"
+            checked
+          />
+          <label class="form-check-label" for="show-hint">Show hints</label>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <h5 class="mb-3">Manage Flashcards</h5>
+        <div class="mb-3">
+          <button class="btn btn-outline-primary w-100 mb-2" id="import-btn">
+            <i class="fas fa-file-import me-2"></i>Import Flashcards
+          </button>
+          <button class="btn btn-outline-primary w-100" id="export-btn">
+            <i class="fas fa-file-export me-2"></i>Export Flashcards
+          </button>
+        </div>
+        <div class="mb-3">
+          <button class="btn btn-primary w-100" id="add-card-btn">
+            <i class="fas fa-plus me-2"></i>Add New Flashcard
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="celebration" id="celebration"></div>
+    <div class="modal fade" id="addCardModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add New Flashcard</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="add-card-form">
+              <div class="mb-3">
+                <label for="new-category" class="form-label">Category</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="new-category"
+                  placeholder="e.g. Science, History"
+                />
+              </div>
+              <div class="mb-3">
+                <label for="new-question" class="form-label">Question</label>
+                <textarea
+                  class="form-control"
+                  id="new-question"
+                  rows="2"
+                  required
+                ></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="new-answer" class="form-label">Answer</label>
+                <textarea
+                  class="form-control"
+                  id="new-answer"
+                  rows="2"
+                  required
+                ></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="new-hint" class="form-label">Hint (optional)</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="new-hint"
+                  placeholder="Optional hint"
+                />
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancel
+            </button>
+            <button type="button" class="btn btn-primary" id="save-card-btn">
+              Save Flashcard
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <audio
+      id="flip-sound"
+      src="FLIP.mp3"
+      preload="auto"
+    ></audio>
+    <audio
+      id="correct-sound"
+      src="CORRECT.mp3"
+      preload="auto"
+    ></audio>
+    <audio
+      id="incorrect-sound"
+      src="INCORRECT.mp3"
+      preload="auto"
+    ></audio>
+    <audio
+      id="complete-sound"
+      src="COMPLETE.mp3"
+      preload="auto"
+    ></audio>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      let flashcards = [
+        {
+          question: "What is the capital of France?",
+          answer: "Paris",
+          category: "Geography",
+          hint: "It's known as the 'City of Light'",
+          known: false,
+          lastReviewed: null,
+          timesReviewed: 0,
+          timesCorrect: 0,
+        },
+        {
+          question: "What is the largest planet in our solar system?",
+          answer: "Jupiter",
+          category: "Astronomy",
+          hint: "It has a giant red spot",
+          known: false,
+          lastReviewed: null,
+          timesReviewed: 0,
+          timesCorrect: 0,
+        },
+        {
+          question: "Who painted the Starry Night?",
+          answer: "Vincent van Gogh",
+          category: "Art",
+          hint: "Dutch post-impressionist painter",
+          known: false,
+          lastReviewed: null,
+          timesReviewed: 0,
+          timesCorrect: 0,
+        },
+        {
+          question: "What is the chemical symbol for gold?",
+          answer: "Au",
+          category: "Chemistry",
+          hint: "Comes from the Latin word 'aurum'",
+          known: false,
+          lastReviewed: null,
+          timesReviewed: 0,
+          timesCorrect: 0,
+        },
+        {
+          question: "In which year did World War II end?",
+          answer: "1945",
+          category: "History",
+          hint: "It ended after the atomic bombs were dropped",
+          known: false,
+          lastReviewed: null,
+          timesReviewed: 0,
+          timesCorrect: 0,
+        },
+        {
+  question: "What is the square root of 64?",
+  answer: "8",
+  category: "Math",
+  hint: "It's a single digit.",
+  known: false,
+  lastReviewed: null,
+  timesReviewed: 0,
+  timesCorrect: 0
+},
+{
+  question: "Who wrote 'Hamlet'?",
+  answer: "William Shakespeare",
+  category: "Literature",
+  hint: "He’s known as the Bard.",
+  known: false,
+  lastReviewed: null,
+  timesReviewed: 0,
+  timesCorrect: 0
+},
+{
+  question: "Which gas do plants absorb from the atmosphere?",
+  answer: "Carbon Dioxide",
+  category: "Biology",
+  hint: "CO₂",
+  known: false,
+  lastReviewed: null,
+  timesReviewed: 0,
+  timesCorrect: 0
+},
+{
+  question: "What is the largest mammal in the world?",
+  answer: "Blue Whale",
+  category: "Nature",
+  hint: "It lives in the ocean.",
+  known: false,
+  lastReviewed: null,
+  timesReviewed: 0,
+  timesCorrect: 0
+},
+{
+  question: "What is the fastest land animal?",
+  answer: "Cheetah",
+  category: "Animals",
+  hint: "It can run up to 70 mph.",
+  known: false,
+  lastReviewed: null,
+  timesReviewed: 0,
+  timesCorrect: 0
+},
+{
+  question: "What is the largest organ in the human body?",
+  answer: "Skin",
+  category: "Biology",
+  hint: "It protects your internal organs",
+  known: false,
+  lastReviewed: null,
+  timesReviewed: 0,
+  timesCorrect: 0
+},
+{
+  question: "What is the capital of Japan?",
+  answer: "Tokyo",
+  category: "Geography",
+  hint: "Hosted the 2020 Olympics",
+  known: false,
+  lastReviewed: null,
+  timesReviewed: 0,
+  timesCorrect: 0
+},
+{
+  question: "Who discovered penicillin?",
+  answer: "Alexander Fleming",
+  category: "Science",
+  hint: "Scottish scientist",
+  known: false,
+  lastReviewed: null,
+  timesReviewed: 0,
+  timesCorrect: 0
+},
+{
+  question: "What is the hardest natural substance on Earth?",
+  answer: "Diamond",
+  category: "Science",
+  hint: "Used in jewelry and cutting tools",
+  known: false,
+  lastReviewed: null,
+  timesReviewed: 0,
+  timesCorrect: 0
+},
+{
+  question: "Which planet is known as the Red Planet?",
+  answer: "Mars",
+  category: "Astronomy",
+  hint: "Named after the Roman god of war",
+  known: false,
+  lastReviewed: null,
+  timesReviewed: 0,
+  timesCorrect: 0
+},
+{
+  question: "What is the chemical formula for water?",
+  answer: "H₂O",
+  category: "Chemistry",
+  hint: "Two hydrogen atoms and one oxygen atom",
+  known: false,
+  lastReviewed: null,
+  timesReviewed: 0,
+  timesCorrect: 0
+},
+{
+  question: "Who wrote 'To Kill a Mockingbird'?",
+  answer: "Harper Lee",
+  category: "Literature",
+  hint: "American author, published in 1960",
+  known: false,
+  lastReviewed: null,
+  timesReviewed: 0,
+  timesCorrect: 0
+},
+{
+  question: "What is the currency of the United Kingdom?",
+  answer: "Pound Sterling (£)",
+  category: "General Knowledge",
+  hint: "Symbol looks like a fancy 'L'",
+  known: false,
+  lastReviewed: null,
+  timesReviewed: 0,
+  timesCorrect: 0
+},
+{
+  question: "How many continents are there?",
+  answer: "7",
+  category: "Geography",
+  hint: "Europe, Asia, Africa...",
+  known: false,
+  lastReviewed: null,
+  timesReviewed: 0,
+  timesCorrect: 0
+},
+{
+  question: "What is the tallest mountain in the world?",
+  answer: "Mount Everest",
+  category: "Geography",
+  hint: "Located in the Himalayas",
+  known: false,
+  lastReviewed: null,
+  timesReviewed: 0,
+  timesCorrect: 0
+},
+{
+  question: "Which animal is known as the 'King of the Jungle'?",
+  answer: "Lion",
+  category: "Animals",
+  hint: "Males have manes",
+  known: false,
+  lastReviewed: null,
+  timesReviewed: 0,
+  timesCorrect: 0
+},
+{
+  question: "What is the main component of the Sun?",
+  answer: "Hydrogen",
+  category: "Astronomy",
+  hint: "Lightest element in the periodic table",
+  known: false,
+  lastReviewed: null,
+  timesReviewed: 0,
+  timesCorrect: 0
+},
+{
+  question: "Who was the first president of the United States?",
+  answer: "George Washington",
+  category: "History",
+  hint: "His face is on the $1 bill",
+  known: false,
+  lastReviewed: null,
+  timesReviewed: 0,
+  timesCorrect: 0
+},
+{
+  question: "What is the largest ocean on Earth?",
+  answer: "Pacific Ocean",
+  category: "Geography",
+  hint: "Covers about 30% of the Earth's surface",
+  known: false,
+  lastReviewed: null,
+  timesReviewed: 0,
+  timesCorrect: 0
+},
+{
+  question: "Which language has the most native speakers?",
+  answer: "Mandarin Chinese",
+  category: "General Knowledge",
+  hint: "Official language of China",
+  known: false,
+  lastReviewed: null,
+  timesReviewed: 0,
+  timesCorrect: 0
+}
+      ];
+      let state = {
+        currentCard: 0,
+        knowCount: 0,
+        dontKnowCount: 0,
+        isFlipped: false,
+        studyMode: "learn",
+        cardOrder: "sequential",
+        soundEnabled: true,
+        theme: "light",
+        autoFlip: true,
+        showHints: true,
+        categories: [
+          "Geography",
+          "Astronomy",
+          "Art",
+          "Chemistry",
+          "History",
+          "General",
+        ],
+        filteredCategory: null,
+      };
+
+      const elements = {
+        flashcard: document.getElementById("flashcard"),
+        question: document.getElementById("question"),
+        answer: document.getElementById("answer"),
+        flipBtn: document.getElementById("flip-btn"),
+        knowBtn: document.getElementById("know-btn"),
+        dontKnowBtn: document.getElementById("dont-know-btn"),
+        hintBtn: document.getElementById("hint-btn"),
+        readQuestionBtn: document.getElementById("read-question-btn"),
+        cardsRemaining: document.getElementById("cards-remaining"),
+        cardsKnown: document.getElementById("cards-known"),
+        cardsUnknown: document.getElementById("cards-unknown"),
+        masteryLevel: document.getElementById("mastery-level"),
+        progressBar: document.getElementById("progress-bar"),
+        progressText: document.getElementById("progress-text"),
+        cardCategory: document.getElementById("card-category"),
+        cardCategoryBack: document.getElementById("card-category-back"),
+        settingsToggle: document.getElementById("settings-toggle"),
+        settingsPanel: document.getElementById("settings-panel"),
+        themeToggle: document.getElementById("theme-toggle"),
+        soundToggle: document.getElementById("sound-toggle"),
+        modeBtns: document.querySelectorAll(".mode-btn"),
+        themeOptions: document.querySelectorAll(".theme-option"),
+        studyModeSelect: document.getElementById("study-mode"),
+        cardOrderSelect: document.getElementById("card-order"),
+        autoFlipCheck: document.getElementById("auto-flip"),
+        showHintCheck: document.getElementById("show-hint"),
+        addCardBtn: document.getElementById("add-card-btn"),
+        addCardModal: new bootstrap.Modal(
+          document.getElementById("addCardModal")
+        ),
+        saveCardBtn: document.getElementById("save-card-btn"),
+        celebration: document.getElementById("celebration"),
+        statsChart: document.getElementById("stats-chart"),
+        flipSound: document.getElementById("flip-sound"),
+        correctSound: document.getElementById("correct-sound"),
+        incorrectSound: document.getElementById("incorrect-sound"),
+        completeSound: document.getElementById("complete-sound"),
+        background: document.getElementById("background"),
+      };
+
+      let statsChart = null;
+      function init() {
+        try {
+          createFallingQuestionMarks();
+          loadSettings();
+          applyTheme();
+          setTimeout(() => {
+            setupChart();
+            updateCard();
+            updateStats();
+            setupEventListeners();
+          }, 100);
+        } catch (err) {
+          console.error("Initialization error:", err);
+          alert(
+            "An error occurred while initializing the app. Please refresh the page."
+          );
+        }
+      }
+      function createFallingQuestionMarks() {
+        try {
+        for (let i = 0; i < 100; i++) {
+  let questionMark = document.createElement("div");
+  questionMark.className = "question-mark";
+  questionMark.style.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+  let x = Math.random() * 100;
+  let delay = Math.random() * 10;
+  let duration = Math.random() * 10 + 10;
+
+  questionMark.style.left = x + "%";
+  questionMark.style.fontSize = Math.random() * 20 + 30 + "px";
+  questionMark.style.animationDelay = delay + "s";
+  questionMark.style.animationDuration = duration + "s";
+  questionMark.innerHTML = "?";
+
+  elements.background.appendChild(questionMark);
+}
+
+        } catch (err) {
+          console.error("Error creating background elements:", err);
+        }
+      }
+      function setupEventListeners() {
+        try {
+          elements.flashcard.addEventListener("click", flipCard);
+          elements.flipBtn.addEventListener("click", flipCard);
+          elements.knowBtn.addEventListener("click", () =>
+            handleResponse(true)
+          );
+          elements.dontKnowBtn.addEventListener("click", () =>
+            handleResponse(false)
+          );
+          elements.hintBtn.addEventListener("click", showHint);
+          elements.readQuestionBtn.addEventListener("click", readQuestion);
+          document.addEventListener("keydown", (e) => {
+            if (e.code === "Space") {
+              e.preventDefault();
+              flipCard();
+            } else if (e.code === "ArrowLeft") {
+              handleResponse(false);
+            } else if (e.code === "ArrowRight") {
+              handleResponse(true);
+            }
+          });
+          elements.settingsToggle.addEventListener(
+            "click",
+            toggleSettingsPanel
+          );
+          elements.themeToggle.addEventListener("click", toggleTheme);
+          elements.soundToggle.addEventListener("click", toggleSound);
+          elements.modeBtns.forEach((btn) => {
+            btn.addEventListener("click", () => {
+              const mode = btn.dataset.mode;
+              setStudyMode(mode);
+            });
+          });
+          elements.themeOptions.forEach((option) => {
+            option.addEventListener("click", () => {
+              setTheme(option.dataset.theme);
+            });
+          });
+          elements.studyModeSelect.addEventListener("change", (e) => {
+            state.studyMode = e.target.value;
+            saveSettings();
+          });
+
+          elements.cardOrderSelect.addEventListener("change", (e) => {
+            state.cardOrder = e.target.value;
+            saveSettings();
+            shuffleCards();
+          });
+
+          elements.autoFlipCheck.addEventListener("change", (e) => {
+            state.autoFlip = e.target.checked;
+            saveSettings();
+          });
+
+          elements.showHintCheck.addEventListener("change", (e) => {
+            state.showHints = e.target.checked;
+            saveSettings();
+            updateCard();
+          });
+          elements.addCardBtn.addEventListener("click", () => {
+            elements.addCardModal.show();
+          });
+
+          elements.saveCardBtn.addEventListener("click", addNewCard);
+          document
+            .getElementById("addCardModal")
+            .addEventListener("hidden.bs.modal", function () {
+              document.getElementById("add-card-form").reset();
+            });
+        } catch (err) {
+          console.error("Error setting up event listeners:", err);
+        }
+      }
+
+      function setupChart() {
+        try {
+          const ctx = elements.statsChart?.getContext("2d");
+          if (!ctx) {
+            console.warn("Chart canvas not found");
+            return;
+          }
+
+          statsChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+              labels: ["Known", "Unknown"],
+              datasets: [
+                {
+                  label: "Performance",
+                  data: [0, 0],
+                  backgroundColor: [
+                    "rgba(0, 184, 148, 0.7)",
+                    "rgba(214, 48, 49, 0.7)",
+                  ],
+                  borderColor: ["rgba(0, 184, 148, 1)", "rgba(214, 48, 49, 1)"],
+                  borderWidth: 1,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    precision: 0,
+                  },
+                },
+              },
+              plugins: {
+                legend: {
+                  display: false,
+                },
+              },
+              onResize: (chart, size) => {
+                if (size.height === 0 || size.width === 0) {
+                  console.warn("Chart container has zero size");
+                }
+              },
+            },
+          });
+        } catch (err) {
+          console.error("Failed to initialize chart:", err);
+        }
+      }
+
+      function updateCard() {
+        try {
+          const card = flashcards[state.currentCard];
+          elements.question.textContent = card.question;
+          elements.answer.textContent = card.answer;
+          elements.cardCategory.textContent = card.category;
+          elements.cardCategoryBack.textContent = card.category;
+          elements.flashcard.classList.remove(
+            "flipped",
+            "correct",
+            "incorrect"
+          );
+          state.isFlipped = false;
+          elements.flashcard.classList.add(
+            "animate__animated",
+            "animate__fadeIn"
+          );
+          setTimeout(() => {
+            elements.flashcard.classList.remove(
+              "animate__animated",
+              "animate__fadeIn"
+            );
+          }, 500);
+
+          updateProgress();
+        } catch (err) {
+          console.error("Error updating card:", err);
+        }
+      }
+
+      function flipCard() {
+        try {
+          if (state.soundEnabled) {
+            elements.flipSound.currentTime = 0;
+            elements.flipSound
+              .play()
+              .catch((err) => console.warn("Audio play failed:", err));
+          }
+
+          state.isFlipped = !state.isFlipped;
+          elements.flashcard.classList.add(
+            "animate__animated",
+            "animate__flipInY"
+          );
+          setTimeout(() => {
+            elements.flashcard.classList.remove(
+              "animate__animated",
+              "animate__flipInY"
+            );
+          }, 500);
+          setTimeout(() => {
+            elements.flashcard.classList.toggle("flipped", state.isFlipped);
+          }, 50);
+        } catch (err) {
+          console.error("Error flipping card:", err);
+        }
+      }
+      function readQuestion() {
+        try {
+          if (window.speechSynthesis && window.SpeechSynthesisUtterance) {
+            const speech = new SpeechSynthesisUtterance();
+            speech.text = elements.question.textContent;
+            speech.rate = 1;
+            speech.pitch = 1;
+            speech.volume = 1;
+
+            try {
+              window.speechSynthesis.cancel();
+              window.speechSynthesis.speak(speech);
+            } catch (err) {
+              console.error("Speech synthesis error:", err);
+              alert("Error reading the question. Please try again.");
+            }
+          } else {
+            alert(
+              "Text-to-speech is not supported in your browser. Try Chrome or Edge."
+            );
+          }
+        } catch (err) {
+          console.error("Error reading question:", err);
+        }
+      }
+
+      function handleResponse(know) {
+        try {
+          const card = flashcards[state.currentCard];
+          card.timesReviewed++;
+          card.lastReviewed = new Date();
+
+          if (know) {
+            if (state.soundEnabled) {
+              elements.correctSound.currentTime = 0;
+              elements.correctSound
+                .play()
+                .catch((err) => console.warn("Audio play failed:", err));
+            }
+
+            state.knowCount++;
+            card.timesCorrect++;
+            card.known = true;
+            elements.flashcard.classList.add("correct");
+          } else {
+            if (state.soundEnabled) {
+              elements.incorrectSound.currentTime = 0;
+              // MADE BY KAIF TARASAGAR 
+              elements.incorrectSound
+                .play()
+                .catch((err) => console.warn("Audio play failed:", err));
+            }
+
+            state.dontKnowCount++;
+            elements.flashcard.classList.add("incorrect");
+          }
+          setTimeout(() => {
+            if (state.isFlipped && state.autoFlip) {
+              flipCard();
+            }
+            setTimeout(() => nextCard(), 200);
+          }, 500);
+        } catch (err) {
+          console.error("Error handling response:", err);
+        }
+      }
+      function showHint() {
+        try {
+          if (!state.showHints) return;
+
+          const card = flashcards[state.currentCard];
+          alert(`Hint: ${card.hint || "No hint available for this card"}`);
+        } catch (err) {
+          console.error("Error showing hint:", err);
+        }
+      }
+      function nextCard() {
+        try {
+          updateStats();
+          if (state.cardOrder === "random") {
+            state.currentCard = Math.floor(Math.random() * flashcards.length);
+          } else {
+            state.currentCard = (state.currentCard + 1) % flashcards.length;
+          }
+          if (
+            state.studyMode === "learn" &&
+            state.knowCount === flashcards.length
+          ) {
+            if (state.soundEnabled) {
+              elements.completeSound.currentTime = 0;
+              elements.completeSound
+                .play()
+                .catch((err) => console.warn("Audio play failed:", err));
+            }
+
+            celebrate();
+            setTimeout(() => {
+              if (
+                confirm(
+                  "Congratulations! You've learned all cards. Would you like to reset your progress and start again?"
+                )
+              ) {
+                resetProgress();
+              }
+            }, 1000);
+            return;
+          }
+
+          updateCard();
+        } catch (err) {
+          console.error("Error moving to next card:", err);
+        }
+      }
+      function updateStats() {
+        try {
+          const total = flashcards.length;
+          const remaining = total - state.knowCount;
+          const mastery =
+            total > 0 ? Math.round((state.knowCount / total) * 100) : 0;
+
+          elements.cardsRemaining.textContent = remaining;
+          elements.cardsKnown.textContent = state.knowCount;
+          elements.cardsUnknown.textContent = state.dontKnowCount;
+          elements.masteryLevel.textContent = `${mastery}%`;
+          if (statsChart) {
+            statsChart.data.datasets[0].data = [
+              state.knowCount,
+              state.dontKnowCount,
+            ];
+            statsChart.update();
+          }
+        } catch (err) {
+          console.error("Error updating stats:", err);
+        }
+      }
+      function updateProgress() {
+        try {
+          const total = flashcards.length;
+          const mastered = flashcards.filter((card) => card.known).length;
+          const progress = (mastered / total) * 100;
+          elements.progressBar.style.width = `${progress}%`;
+          elements.progressText.textContent = `${Math.round(progress)}%`;
+        } catch (err) {
+          console.error("Error updating progress:", err);
+        }
+      }
+      function shuffleCards() {
+        try {
+          if (state.cardOrder === "random") {
+            for (let i = flashcards.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1));
+              [flashcards[i], flashcards[j]] = [flashcards[j], flashcards[i]];
+            }
+            state.currentCard = 0;
+            updateCard();
+          }
+        } catch (err) {
+          console.error("Error shuffling cards:", err);
+        }
+      }
+      function setStudyMode(mode) {
+        try {
+          state.studyMode = mode;
+          elements.modeBtns.forEach((btn) => {
+            btn.classList.toggle("active", btn.dataset.mode === mode);
+          });
+          if (mode === "learn") {
+            resetProgress();
+          }
+
+          saveSettings();
+        } catch (err) {
+          console.error("Error setting study mode:", err);
+        }
+      }
+      function resetProgress() {
+        try {
+          state.knowCount = 0;
+          state.dontKnowCount = 0;
+          state.currentCard = 0;
+
+          flashcards.forEach((card) => {
+            card.known = false;
+          });
+
+          updateStats();
+          updateCard();
+          elements.progressBar.style.width = "0%";
+          elements.progressText.textContent = "0%";
+        } catch (err) {
+          console.error("Error resetting progress:", err);
+        }
+      }
+      function toggleSettingsPanel() {
+        try {
+          elements.settingsPanel.classList.toggle("open");
+          elements.settingsToggle.innerHTML =
+            elements.settingsPanel.classList.contains("open")
+              ? '<i class="fas fa-times"></i>'
+              : '<i class="fas fa-cog"></i>';
+        } catch (err) {
+          console.error("Error toggling settings panel:", err);
+        }
+      }
+      function toggleTheme() {
+        try {
+          state.theme = state.theme === "light" ? "dark" : "light";
+          applyTheme();
+          saveSettings();
+        } catch (err) {
+          console.error("Error toggling theme:", err);
+        }
+      }
+      function setTheme(theme) {
+        try {
+          state.theme = theme;
+          applyTheme();
+          saveSettings();
+          elements.themeOptions.forEach((option) => {
+            option.classList.toggle("active", option.dataset.theme === theme);
+          });
+        } catch (err) {
+          console.error("Error setting theme:", err);
+        }
+      }
+      function applyTheme() {
+        try {
+          document.body.setAttribute("data-theme", state.theme);
+          elements.themeToggle.innerHTML =
+            state.theme === "dark"
+              ? '<i class="fas fa-sun"></i>'
+              : '<i class="fas fa-moon"></i>';
+        } catch (err) {
+          console.error("Error applying theme:", err);
+        }
+      }
+      function toggleSound() {
+        try {
+          state.soundEnabled = !state.soundEnabled;
+          elements.soundToggle.innerHTML = state.soundEnabled
+            ? '<i class="fas fa-volume-up"></i>'
+            : '<i class="fas fa-volume-mute"></i>'; // MADE BY KAIF TARASGAR
+          saveSettings();
+        } catch (err) {
+          console.error("Error toggling sound:", err);
+        }
+      }
+      function celebrate() {
+        try {
+          confetti({
+            particleCount: 150,
+            spread: 70,
+            origin: { y: 0.6 },
+          });
+
+          elements.celebration.innerHTML = "";
+          const emojis = ["🎉", "✨", "🌟", "🥳", "👍", "👏"];
+
+         for (let i = 0; i < 100; i++) {
+            const emoji = document.createElement("div");
+            emoji.textContent =
+              emojis[Math.floor(Math.random() * emojis.length)];
+            emoji.style.position = "absolute";
+            emoji.style.fontSize = `${Math.random() * 20 + 20}px`;
+            emoji.style.left = `${Math.random() * 100}%`;
+            emoji.style.top = `${Math.random() * 100}%`;
+            emoji.style.opacity = "0";
+            emoji.style.animation = `bounce ${Math.random() * 2 + 2}s infinite`;
+            setTimeout(() => {
+              emoji.style.transition = "opacity 1s";
+              emoji.style.opacity = "1";
+            }, i * 100);
+            setTimeout(() => {
+              emoji.style.opacity = "0";
+              setTimeout(() => {
+                emoji.remove();
+              }, 1000);
+            }, 3000 + i * 100);
+
+            elements.celebration.appendChild(emoji);
+          }
+        } catch (err) {
+          console.error("Error with celebration:", err);
+        }
+      }
+      function addNewCard() {
+        try {
+          const question = document.getElementById("new-question").value.trim();
+          const answer = document.getElementById("new-answer").value.trim();
+          const category =
+            document.getElementById("new-category").value.trim() || "General";
+          const hint = document.getElementById("new-hint").value.trim();
+
+          if (question && answer) {
+            const newCard = {
+              question,
+              answer,
+              category,
+              hint: hint || null,
+              known: false,
+              lastReviewed: null,
+              timesReviewed: 0,
+              timesCorrect: 0,
+            };
+
+            flashcards.push(newCard);
+            if (!state.categories.includes(category)) {
+              state.categories.push(category);
+            }
+            document.getElementById("add-card-form").reset();
+            elements.addCardModal.hide();
+            updateStats();
+            updateCard();
+            alert("Flashcard added successfully!");
+          } else {
+            alert("Please fill in both question and answer fields.");
+          }
+        } catch (err) {
+          console.error("Error adding new card:", err);
+          alert(
+            "An error occurred while adding the flashcard. Please try again."
+          );
+        }
+      }
+
+      function saveSettings() {
+        try {
+          localStorage.setItem(
+            "flashcardMasterSettings",
+            JSON.stringify(state)
+          );
+        } catch (err) {
+          console.error("Error saving settings:", err);
+        }
+      }
+
+      function loadSettings() {
+        try {
+          const savedSettings = localStorage.getItem("flashcardMasterSettings");
+          if (savedSettings) {
+            const parsed = JSON.parse(savedSettings);
+            if (parsed && typeof parsed === "object") {
+              Object.assign(state, parsed);
+            }
+          }
+
+          applyTheme();
+          setStudyMode(state.studyMode);
+          if (elements.studyModeSelect)
+            elements.studyModeSelect.value = state.studyMode;
+          if (elements.cardOrderSelect)
+            elements.cardOrderSelect.value = state.cardOrder;
+          if (elements.autoFlipCheck)
+            elements.autoFlipCheck.checked = state.autoFlip;
+          if (elements.showHintCheck)
+          // MADE BY KAIF TARASGAR
+            elements.showHintCheck.checked = state.showHints;
+          if (elements.soundToggle) {
+            elements.soundToggle.innerHTML = state.soundEnabled
+              ? '<i class="fas fa-volume-up"></i>'
+              : '<i class="fas fa-volume-mute"></i>';
+          }
+
+          if (elements.themeOptions) {
+            elements.themeOptions.forEach((option) => {
+              option.classList.toggle(
+                "active",
+                option.dataset.theme === state.theme
+              );
+            });
+          }
+        } catch (err) {
+          console.error("Error loading settings:", err);
+          localStorage.removeItem("flashcardMasterSettings");
+          // MADE BY KAIF TARASAGAR 
+        }
+      }
+      document.addEventListener("DOMContentLoaded", init);
+    </script>
+  </body>
+</html>
+
+
+
+
+                                              <!-- MADE BY KAIF TARASAGAR 
+                                               
+                                              https://www.linkedin.com/in/kaif-tarasgar-0b5425326/
+                                              
+                                              https://x.com/Kaif_T_200-->
