@@ -55,4 +55,4 @@ This project is open source
 
 ---
 
-## Made with ❤️ by Kaif Tarasgar | Live Demo--> https://682907dd3b4582acd400f1b4--flashcard-zone.netlify.app/
+Made with ❤️ by Kaif Tarasgar | Live Demo--> https://682907dd3b4582acd400f1b4--flashcard-zone.netlify.app/
