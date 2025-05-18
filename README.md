@@ -1,9 +1,9 @@
-✨ Flashcard Master
+#✨ Flashcard Master
 
-📌 Overview
+##📌 Overview
 Flashcard Master is an interactive web application designed to help users study and memorize information using digital flashcards. With a beautiful UI, multiple themes, sound effects, and progress tracking, it makes learning engaging and effective.
 
-🚀 Features
+##🚀 Features
 - **Interactive Flashcards**: Flip cards with animations
 - **Multiple Themes**: Light, Dark, Blue, and Green themes
 - **Study Modes**: Learn mode with progress tracking
@@ -13,7 +13,7 @@ Flashcard Master is an interactive web application designed to help users study 
 - **Customizable**: Add your own flashcards and categories
 - **Celebration Effects**: Confetti animation when you complete a deck
 
-🛠️ Technologies Used
+##🛠️ Technologies Used
 - HTML5, CSS3, JavaScript
 - Bootstrap 5 for responsive design
 - Chart.js for statistics visualization
@@ -21,14 +21,14 @@ Flashcard Master is an interactive web application designed to help users study 
 - Web Speech API for text-to-speech
 - Animate.css for animations
 
-🏁 Getting Started
+##🏁 Getting Started
 1. Clone the repository:
    ```bash
    git clone https://github.com/Kaif-T-200/FLASHCARD.git
    ```
 2. Open `index.html` in your browser
 
-📝 How to Use
+##📝 How to Use
 1. Click on a flashcard or press Space to flip it
 2. Use:
    - ✅ "Know" button (or Right Arrow key) if you knew the answer
@@ -36,7 +36,7 @@ Flashcard Master is an interactive web application designed to help users study 
 3. Track your progress with the statistics panel
 4. Customize settings in the panel (top-right cog icon)
 
-📂 File Structure
+##📂 File Structure
 ```
 FLASHCARD/
 ├── index.html          # Main application file
@@ -47,12 +47,12 @@ FLASHCARD/
 └── COMPLETE.mp3        # Deck completion sound
 ```
 
-🤝 Contributing
+##🤝 Contributing
 Contributions are welcome! Please fork the repository and create a pull request with your improvements.
 
-📜 License
+##📜 License
 This project is open source 
 
 ---
 
-Made with ❤️ by Kaif Tarasgar | Live Demo--> 
+Made with ❤️ by Kaif Tarasgar | Live Demo--> https://682907dd3b4582acd400f1b4--flashcard-zone.netlify.app/
