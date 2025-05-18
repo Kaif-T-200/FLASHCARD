@@ -1,4 +1,4 @@
-#✨ Flashcard Master
+# ✨ Flashcard Master
 
 ##📌 Overview
 Flashcard Master is an interactive web application designed to help users study and memorize information using digital flashcards. With a beautiful UI, multiple themes, sound effects, and progress tracking, it makes learning engaging and effective.
